@@ -1,0 +1,3 @@
+#!/bin/zsh
+buffer=`cat`
+echo ${buffer:21:-1} | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g'
