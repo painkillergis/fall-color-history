@@ -14,7 +14,7 @@ version = ProcessBuilder("sh", "-c", "git rev-list --count HEAD")
   .inputStream.bufferedReader().readText().trim()
 
 application {
-  mainClass.set("com.painkillergis.ktor_starter.ApplicationKt")
+  mainClass.set("com.painkillergis.fall_color_history.ApplicationKt")
 }
 
 repositories {
@@ -63,7 +63,7 @@ tasks.jar {
 }
 
 tasks.withType<ShadowJar> {
-  archiveBaseName.set("ktor-starter")
+  archiveBaseName.set("fall-color-history")
   archiveClassifier.set("")
   archiveVersion.set("")
 }

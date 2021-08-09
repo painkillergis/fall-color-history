@@ -1,7 +1,7 @@
-package com.painkillergis.ktor_starter
+package com.painkillergis.fall_color_history
 
-import com.painkillergis.ktor_starter.version.VersionService
-import com.painkillergis.ktor_starter.version.versionController
+import com.painkillergis.fall_color_history.version.VersionService
+import com.painkillergis.fall_color_history.version.versionController
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.serialization.*

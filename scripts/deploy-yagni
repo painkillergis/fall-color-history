@@ -1,2 +1,2 @@
-scp build/libs/ktor-starter.jar yagni:ktor-starter/application.jar
-ssh yagni -- systemctl restart ktor-starter --user
+scp build/libs/fall-color-history.jar yagni:fall-color-history/application.jar
+ssh yagni -- systemctl restart fall-color-history --user

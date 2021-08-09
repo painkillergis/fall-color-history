@@ -1,4 +1,4 @@
-package com.painkillergis.ktor_starter.version
+package com.painkillergis.fall_color_history.version
 
 import io.ktor.application.*
 import io.ktor.response.*

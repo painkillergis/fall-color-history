@@ -1,6 +1,6 @@
-package com.painkillergis.ktor_starter.version
+package com.painkillergis.fall_color_history.version
 
-import com.painkillergis.ktor_starter.util.withConfiguredTestApplication
+import com.painkillergis.fall_color_history.util.withConfiguredTestApplication
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldMatch
