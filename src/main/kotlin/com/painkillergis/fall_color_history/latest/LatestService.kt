@@ -5,7 +5,7 @@ class LatestService {
 
   fun get() = state
 
-  fun put() {
-    state = mapOf("the" to "latest")
+  fun put(next: Map<String, String>) {
+    state = next
   }
 }

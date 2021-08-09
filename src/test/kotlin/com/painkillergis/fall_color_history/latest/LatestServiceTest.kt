@@ -10,8 +10,8 @@ class LatestServiceTest : FunSpec({
 
   test("put latest") {
     LatestService().apply {
-      put()
-      get() shouldBe mapOf("the" to "latest")
+      put(mapOf("the" to "late latest"))
+      get() shouldBe mapOf("the" to "late latest")
     }
   }
 })

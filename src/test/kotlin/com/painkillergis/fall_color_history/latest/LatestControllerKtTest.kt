@@ -50,7 +50,7 @@ class LatestControllerKtTest : FunSpec({
   }
 
   test("put to service has error") {
-    every { latestService.put() } throws RuntimeException("the message")
+    every { latestService.put(mapOf("the" to "late latest")) } throws RuntimeException("the message")
     withTestController({ latestController(latestService) }) {
       handleRequest(HttpMethod.Put, "/latest").apply {
         response.status() shouldBe HttpStatusCode.InternalServerError

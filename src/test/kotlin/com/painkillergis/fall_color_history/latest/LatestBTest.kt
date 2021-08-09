@@ -6,6 +6,7 @@ import io.kotest.matchers.shouldBe
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class LatestBTest : FunSpec({
@@ -20,14 +21,17 @@ class LatestBTest : FunSpec({
 
   test("put latest") {
     withConfiguredTestApplication {
-      handleRequest(HttpMethod.Put, "/latest").apply {
+      handleRequest(HttpMethod.Put, "/latest") {
+        addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+        setBody(Json.encodeToString(mapOf("the" to "late latest")))
+      }.apply {
         response.status() shouldBe HttpStatusCode.NoContent
       }
 
       handleRequest(HttpMethod.Get, "/latest").apply {
         response.status() shouldBe HttpStatusCode.OK
         Json.decodeFromString<Map<String, String>>(response.content!!) shouldBe mapOf(
-          "the" to "latest",
+          "the" to "late latest",
         )
       }
     }

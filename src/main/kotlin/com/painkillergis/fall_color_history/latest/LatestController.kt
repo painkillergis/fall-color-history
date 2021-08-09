@@ -16,7 +16,7 @@ fun Application.latestController(latestService: LatestService) =
     }
     put("/latest") {
       try {
-        latestService.put()
+        latestService.put(mapOf("the" to "late latest"))
         call.respond(HttpStatusCode.NoContent)
       } catch (exception: Exception) {
         call.respond(HttpStatusCode.InternalServerError)
