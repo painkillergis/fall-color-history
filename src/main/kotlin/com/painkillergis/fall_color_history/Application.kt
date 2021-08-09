@@ -1,5 +1,6 @@
 package com.painkillergis.fall_color_history
 
+import com.painkillergis.fall_color_history.latest.latestController
 import com.painkillergis.fall_color_history.version.VersionService
 import com.painkillergis.fall_color_history.version.versionController
 import io.ktor.application.*
@@ -15,6 +16,7 @@ fun Application.globalModules() {
 }
 
 fun Application.controllers() {
+  latestController()
   versionController(
     VersionService(),
   )
