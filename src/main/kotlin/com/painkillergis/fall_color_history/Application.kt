@@ -7,7 +7,6 @@ import com.painkillergis.fall_color_history.version.versionController
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.serialization.*
-import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 
 fun Application.globalModules() {
