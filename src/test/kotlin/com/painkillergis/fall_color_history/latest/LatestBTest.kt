@@ -23,11 +23,7 @@ class LatestBTest : FunSpec({
       handleRequest(HttpMethod.Put, "/latest").apply {
         response.status() shouldBe HttpStatusCode.NoContent
       }
-    }
-  }
 
-  test("latest is the same") {
-    withConfiguredTestApplication {
       handleRequest(HttpMethod.Get, "/latest").apply {
         response.status() shouldBe HttpStatusCode.OK
         Json.decodeFromString<Map<String, String>>(response.content!!) shouldBe mapOf(

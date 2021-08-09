@@ -5,12 +5,21 @@ import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.routing.*
 
-fun Application.latestController() =
+fun Application.latestController(latestService: LatestService) =
   routing {
     get("/latest") {
-      call.respond(mapOf("the" to "latest"))
+      try {
+        call.respond(latestService.get())
+      } catch (exception: Exception) {
+        call.respond(HttpStatusCode.InternalServerError)
+      }
     }
     put("/latest") {
-      call.respond(HttpStatusCode.NoContent)
+      try {
+        latestService.put()
+        call.respond(HttpStatusCode.NoContent)
+      } catch (exception: Exception) {
+        call.respond(HttpStatusCode.InternalServerError)
+      }
     }
   }
