@@ -20,14 +20,9 @@ fun Application.controllers() {
   )
 }
 
-fun main() {
-  embeddedServer(
-    Netty,
-    port = 8080,
-    host = "0.0.0.0",
-  ) {
-    globalModules()
-    controllers()
-  }
-    .start(wait = true)
+fun main(args: Array<String>): Unit = EngineMain.main(args)
+
+fun Application.module() {
+  globalModules()
+  controllers()
 }
