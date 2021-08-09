@@ -26,4 +26,12 @@ class LatestControllerKtTest : FunSpec({
       }
     }
   }
+
+  test("put does nothing") {
+    withTestController({ latestController() }) {
+      handleRequest(HttpMethod.Put, "/latest").apply {
+        response.status() shouldBe HttpStatusCode.NoContent
+      }
+    }
+  }
 })
