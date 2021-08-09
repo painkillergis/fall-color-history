@@ -9,6 +9,7 @@ import io.ktor.server.testing.*
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 fun <R> withTestController(controller: Application.() -> Unit, block: TestApplicationEngine.() -> R) =
@@ -41,18 +42,24 @@ class LatestControllerKtTest : FunSpec({
     }
   }
 
-  test("put to service") {
+  test("put to service with next latest") {
     withTestController({ latestController(latestService) }) {
-      handleRequest(HttpMethod.Put, "/latest").apply {
+      handleRequest(HttpMethod.Put, "/latest") {
+        addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+        setBody(Json.encodeToString(mapOf("the" to "late late latest")))
+      }.apply {
         response.status() shouldBe HttpStatusCode.NoContent
       }
     }
   }
 
   test("put to service has error") {
-    every { latestService.put(mapOf("the" to "late latest")) } throws RuntimeException("the message")
+    every { latestService.put(mapOf("the" to "late late latest")) } throws RuntimeException("the message")
     withTestController({ latestController(latestService) }) {
-      handleRequest(HttpMethod.Put, "/latest").apply {
+      handleRequest(HttpMethod.Put, "/latest") {
+        addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+        setBody(Json.encodeToString(mapOf("the" to "late late latest")))
+      }.apply {
         response.status() shouldBe HttpStatusCode.InternalServerError
       }
     }
