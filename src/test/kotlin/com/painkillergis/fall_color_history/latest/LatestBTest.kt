@@ -9,6 +9,23 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
 class LatestBTest : FunSpec({
+  test("no latest") {
+    withConfiguredTestApplication {
+      handleRequest(HttpMethod.Get, "/latest").apply {
+        response.status() shouldBe HttpStatusCode.OK
+        Json.decodeFromString<Map<String, String>>(response.content!!) shouldBe emptyMap()
+      }
+    }
+  }
+
+  test("put latest") {
+    withConfiguredTestApplication {
+      handleRequest(HttpMethod.Put, "/latest").apply {
+        response.status() shouldBe HttpStatusCode.NoContent
+      }
+    }
+  }
+
   test("latest is the same") {
     withConfiguredTestApplication {
       handleRequest(HttpMethod.Get, "/latest").apply {
