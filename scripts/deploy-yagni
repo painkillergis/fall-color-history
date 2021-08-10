@@ -1,2 +1,6 @@
-scp build/libs/fall-color-history.jar yagni:fall-color-history/application.jar
-ssh yagni -- systemctl restart fall-color-history --user
+cat <<EOF | ssh yagni
+  cd /home/arctair/fall-color-history
+  git pull
+  ./gradlew shadowJar
+  systemctl restart fall-color-history --user
+EOF
