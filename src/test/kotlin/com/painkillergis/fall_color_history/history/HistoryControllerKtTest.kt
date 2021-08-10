@@ -13,7 +13,7 @@ import kotlinx.serialization.json.*
 import org.slf4j.Logger
 
 class HistoryControllerKtTest : FunSpec({
-  val historyService = mockk<HistoryService>()
+  val historyService = mockk<HistoryService>(relaxed = true)
   val log = mockk<Logger>(relaxed = true)
 
   fun <R> withTestController(block: TestApplicationEngine.() -> R) =
@@ -41,6 +41,25 @@ class HistoryControllerKtTest : FunSpec({
         response.status() shouldBe HttpStatusCode.InternalServerError
       }
       verify { log.error("There was an error getting history", exception) }
+    }
+  }
+
+  test("delete history") {
+    withTestController {
+      handleRequest(HttpMethod.Delete, "/history").apply {
+        response.status() shouldBe HttpStatusCode.NoContent
+      }
+    }
+  }
+
+  test("delete history has error") {
+    withTestController {
+      val exception = RuntimeException("the message")
+      every { historyService.clear() } throws exception
+      handleRequest(HttpMethod.Delete, "/history").apply {
+        response.status() shouldBe HttpStatusCode.InternalServerError
+      }
+      verify { log.error("There was an error clearing history", exception) }
     }
   }
 })

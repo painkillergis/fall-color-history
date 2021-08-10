@@ -18,12 +18,13 @@ fun Application.globalModules() {
 }
 
 fun Application.controllers() {
+  val historyService = HistoryService()
   historyController(
-    HistoryService(),
+    historyService,
     log,
   )
   latestController(
-    LatestService(),
+    LatestService(historyService),
     log,
   )
   versionController(

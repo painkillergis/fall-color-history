@@ -16,5 +16,14 @@ fun Application.historyController(historyService: HistoryService, log: Logger) {
         call.respond(HttpStatusCode.InternalServerError)
       }
     }
+    delete("/history") {
+      try {
+        historyService.clear()
+        call.respond(HttpStatusCode.NoContent)
+      } catch (exception: Exception) {
+        log.error("There was an error clearing history", exception)
+        call.respond(HttpStatusCode.InternalServerError)
+      }
+    }
   }
 }

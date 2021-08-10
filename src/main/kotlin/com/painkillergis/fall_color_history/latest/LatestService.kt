@@ -1,14 +1,18 @@
 package com.painkillergis.fall_color_history.latest
 
+import com.painkillergis.fall_color_history.history.HistoryService
 import kotlinx.serialization.json.JsonObject
 
-class LatestService {
+class LatestService(
+  private val historyService: HistoryService,
+) {
   private var state = emptyMap<String, Any>()
 
   fun get() = state
 
   fun put(next: JsonObject) {
     state = next
+    historyService.notify(next)
   }
 
   fun clear() {
