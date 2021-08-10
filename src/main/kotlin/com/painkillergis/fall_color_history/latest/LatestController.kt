@@ -5,13 +5,15 @@ import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import org.slf4j.Logger
 
-fun Application.latestController(latestService: LatestService) =
+fun Application.latestController(latestService: LatestService, log: Logger) =
   routing {
     get("/latest") {
       try {
         call.respond(latestService.get())
       } catch (exception: Exception) {
+        log.error("There was an error getting the latest", exception)
         call.respond(HttpStatusCode.InternalServerError)
       }
     }
@@ -20,6 +22,7 @@ fun Application.latestController(latestService: LatestService) =
         latestService.put(call.receive())
         call.respond(HttpStatusCode.NoContent)
       } catch (exception: Exception) {
+        log.error("There was an error setting the latest", exception)
         call.respond(HttpStatusCode.InternalServerError)
       }
     }

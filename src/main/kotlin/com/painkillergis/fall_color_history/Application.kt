@@ -18,6 +18,7 @@ fun Application.globalModules() {
 fun Application.controllers() {
   latestController(
     LatestService(),
+    log,
   )
   versionController(
     VersionService(),
