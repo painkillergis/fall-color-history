@@ -10,4 +10,8 @@ class LatestService {
   fun put(next: JsonObject) {
     state = next
   }
+
+  fun clear() {
+    state = emptyMap()
+  }
 }

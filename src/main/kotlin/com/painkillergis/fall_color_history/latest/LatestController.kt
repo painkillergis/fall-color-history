@@ -27,4 +27,13 @@ fun Application.latestController(latestService: LatestService, log: Logger) =
         call.respond(HttpStatusCode.InternalServerError)
       }
     }
+    delete("/latest") {
+      try {
+        latestService.clear()
+        call.respond(HttpStatusCode.NoContent)
+      } catch (exception: Exception) {
+        log.error("There was an error clearing the latest", exception)
+        call.respond(HttpStatusCode.InternalServerError)
+      }
+    }
   }

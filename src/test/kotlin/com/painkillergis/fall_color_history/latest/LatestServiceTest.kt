@@ -6,16 +6,26 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
 class LatestServiceTest : FunSpec({
+  val latestService = LatestService()
+
   test("default latest") {
-    LatestService().get() shouldBe emptyMap()
+    latestService.get() shouldBe emptyMap()
   }
 
   test("put latest") {
     val jsonObject = buildJsonObject { put("the", "late latest") }
 
-    LatestService().apply {
+    latestService.apply {
       put(jsonObject)
       get() shouldBe jsonObject
     }
+  }
+
+  test("clear") {
+    latestService.put(buildJsonObject { put("the", "update to clear") })
+
+    latestService.clear()
+
+    latestService.get() shouldBe emptyMap()
   }
 })

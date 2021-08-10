@@ -80,4 +80,24 @@ class LatestControllerKtTest : FunSpec({
       verify { log.error("There was an error setting the latest", exception) }
     }
   }
+
+  test("clear latest") {
+    withTestController {
+      handleRequest(HttpMethod.Delete, "/latest").apply {
+        response.status() shouldBe HttpStatusCode.NoContent
+      }
+    }
+  }
+
+  test("clear latest has error") {
+    val exception = RuntimeException("the message")
+    every { latestService.clear() } throws exception
+    withTestController {
+      handleRequest(HttpMethod.Delete, "/latest").apply {
+        response.status() shouldBe HttpStatusCode.InternalServerError
+      }
+      verify { log.error("There was an error clearing the latest", exception) }
+    }
+  }
+
 })

@@ -11,6 +11,10 @@ import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 
 class LatestBTest : BFunSpec({ httpClient ->
+  afterEach {
+    httpClient.delete<Unit>("/latest")
+  }
+
   test("no latest") {
     httpClient.get<HttpResponse>("/latest").apply {
       status shouldBe HttpStatusCode.OK
