@@ -1,5 +1,7 @@
 package com.painkillergis.fall_color_history
 
+import com.painkillergis.fall_color_history.history.HistoryService
+import com.painkillergis.fall_color_history.history.historyController
 import com.painkillergis.fall_color_history.latest.LatestService
 import com.painkillergis.fall_color_history.latest.latestController
 import com.painkillergis.fall_color_history.version.VersionService
@@ -16,6 +18,10 @@ fun Application.globalModules() {
 }
 
 fun Application.controllers() {
+  historyController(
+    HistoryService(),
+    log,
+  )
   latestController(
     LatestService(),
     log,
