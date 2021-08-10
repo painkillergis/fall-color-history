@@ -1,7 +1,6 @@
 package com.painkillergis.fall_color_history.latest
 
 import com.painkillergis.fall_color_history.util.BFunSpec
-import com.painkillergis.fall_color_history.util.EmbeddedServerTestListener.withEmbeddedServerHttpClient
 import io.kotest.matchers.shouldBe
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -11,30 +10,26 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 
-class LatestBTest : BFunSpec({
+class LatestBTest : BFunSpec({ httpClient ->
   test("no latest") {
-    withEmbeddedServerHttpClient {
-      get<HttpResponse>("/latest").apply {
-        status shouldBe HttpStatusCode.OK
-        receive<JsonObject>() shouldBe emptyMap()
-      }
+    httpClient.get<HttpResponse>("/latest").apply {
+      status shouldBe HttpStatusCode.OK
+      receive<JsonObject>() shouldBe emptyMap()
     }
   }
 
   test("put latest") {
-    withEmbeddedServerHttpClient {
-      val next = buildJsonObject { put("locations", buildJsonArray { }) }
-      put<HttpResponse>("/latest") {
-        contentType(ContentType.Application.Json)
-        body = next
-      }.apply {
-        status shouldBe HttpStatusCode.NoContent
-      }
+    val next = buildJsonObject { put("locations", buildJsonArray { }) }
+    httpClient.put<HttpResponse>("/latest") {
+      contentType(ContentType.Application.Json)
+      body = next
+    }.apply {
+      status shouldBe HttpStatusCode.NoContent
+    }
 
-      get<HttpResponse>("/latest").apply {
-        status shouldBe HttpStatusCode.OK
-        receive<JsonObject>() shouldBe next
-      }
+    httpClient.get<HttpResponse>("/latest").apply {
+      status shouldBe HttpStatusCode.OK
+      receive<JsonObject>() shouldBe next
     }
   }
 })

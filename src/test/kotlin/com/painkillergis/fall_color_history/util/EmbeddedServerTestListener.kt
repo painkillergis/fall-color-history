@@ -20,7 +20,7 @@ object EmbeddedServerTestListener {
 
   private val server = embeddedServer(Netty, port = 8080) { module() }
 
-  private val httpClient = HttpClient {
+  val httpClient = HttpClient {
     defaultRequest {
       url.protocol = URLProtocol.HTTP
       url.host = "localhost"
@@ -55,7 +55,4 @@ object EmbeddedServerTestListener {
       server.stop(1000, 1000)
     }
   }
-
-  suspend fun withEmbeddedServerHttpClient(block: suspend HttpClient.() -> Unit) =
-    block(httpClient)
 }
