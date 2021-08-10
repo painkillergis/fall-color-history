@@ -29,9 +29,12 @@ dependencies {
   implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:+")
   testImplementation("io.kotest:kotest-assertions-core:+")
   testImplementation("io.kotest:kotest-runner-junit5:+")
+  testImplementation("io.ktor:ktor-client-serialization:+")
   testImplementation("io.ktor:ktor-server-tests:+")
   testImplementation("io.mockk:mockk:+")
   testImplementation("org.jetbrains.kotlin:kotlin-test:+")
+  testImplementation("io.ktor:ktor-client-core:+")
+  testImplementation("io.ktor:ktor-client-cio:+")
 }
 
 configurations.all {

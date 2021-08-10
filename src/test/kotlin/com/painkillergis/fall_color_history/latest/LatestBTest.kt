@@ -1,38 +1,41 @@
 package com.painkillergis.fall_color_history.latest
 
-import com.painkillergis.fall_color_history.util.withConfiguredTestApplication
+import com.painkillergis.fall_color_history.util.EmbeddedServerTestListener
+import com.painkillergis.fall_color_history.util.EmbeddedServerTestListener.withEmbeddedServerHttpClient
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import io.ktor.client.call.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.server.testing.*
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 class LatestBTest : FunSpec({
+  listeners(EmbeddedServerTestListener)
+
   test("no latest") {
-    withConfiguredTestApplication {
-      handleRequest(HttpMethod.Get, "/latest").apply {
-        response.status() shouldBe HttpStatusCode.OK
-        Json.decodeFromString<Map<String, String>>(response.content!!) shouldBe emptyMap()
+    withEmbeddedServerHttpClient {
+      get<HttpResponse>("/latest").apply {
+        status shouldBe HttpStatusCode.OK
+        receive<JsonObject>() shouldBe emptyMap()
       }
     }
   }
 
   test("put latest") {
-    withConfiguredTestApplication {
-      handleRequest(HttpMethod.Put, "/latest") {
-        addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-        setBody(Json.encodeToString(mapOf("the" to "late latest")))
+    withEmbeddedServerHttpClient {
+      put<HttpResponse>("/latest") {
+        contentType(ContentType.Application.Json)
+        body = mapOf("the" to "late latest")
       }.apply {
-        response.status() shouldBe HttpStatusCode.NoContent
+        status shouldBe HttpStatusCode.NoContent
       }
 
-      handleRequest(HttpMethod.Get, "/latest").apply {
-        response.status() shouldBe HttpStatusCode.OK
-        Json.decodeFromString<Map<String, String>>(response.content!!) shouldBe mapOf(
-          "the" to "late latest",
-        )
+      get<HttpResponse>("/latest").apply {
+        status shouldBe HttpStatusCode.OK
+        receive<JsonObject>() shouldBe buildJsonObject { put("the", "late latest") }
       }
     }
   }
