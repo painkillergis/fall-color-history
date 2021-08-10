@@ -1,9 +1,9 @@
 package com.painkillergis.fall_color_history.util
 
 import com.painkillergis.fall_color_history.module
-import io.kotest.core.listeners.TestListener
+import io.kotest.core.listeners.ProjectListener
+import io.kotest.core.spec.AutoScan
 import io.kotest.core.test.TestCase
-import io.kotest.core.test.TestResult
 import io.ktor.client.*
 import io.ktor.client.features.*
 import io.ktor.client.features.json.*
@@ -15,7 +15,7 @@ import io.ktor.server.netty.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout
 
-object EmbeddedServerTestListener : TestListener {
+object EmbeddedServerTestListener {
   private var started = false
 
   private val server = embeddedServer(Netty, port = 8080) { module() }
@@ -29,26 +29,31 @@ object EmbeddedServerTestListener : TestListener {
     install(JsonFeature)
   }
 
-  override suspend fun beforeTest(testCase: TestCase) {
-    if (started) return
-    server.start()
-    started = true
-    withTimeout(4000) {
-      while (!isRunning()) {
-        delay(250)
+  object ServerStart : io.kotest.core.listeners.TestListener {
+    override suspend fun beforeTest(testCase: TestCase) {
+      if (started) return
+      server.start()
+      started = true
+      withTimeout(4000) {
+        while (!isRunning()) {
+          delay(250)
+        }
       }
     }
+
+    private suspend fun isRunning() =
+      try {
+        httpClient.get<HttpResponse>("/version").status == HttpStatusCode.OK
+      } catch (exception: Exception) {
+        false
+      }
   }
 
-  private suspend fun isRunning() =
-    try {
-      httpClient.get<HttpResponse>("/version").status == HttpStatusCode.OK
-    } catch (exception: Exception) {
-      false
+  @AutoScan
+  object ServerStop : ProjectListener {
+    override suspend fun afterProject() {
+      server.stop(1000, 1000)
     }
-
-  override suspend fun afterTest(testCase: TestCase, result: TestResult) {
-    server.stop(1000, 1000)
   }
 
   suspend fun withEmbeddedServerHttpClient(block: suspend HttpClient.() -> Unit) =

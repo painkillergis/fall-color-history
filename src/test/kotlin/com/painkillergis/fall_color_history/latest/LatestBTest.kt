@@ -1,8 +1,7 @@
 package com.painkillergis.fall_color_history.latest
 
-import com.painkillergis.fall_color_history.util.EmbeddedServerTestListener
+import com.painkillergis.fall_color_history.util.BFunSpec
 import com.painkillergis.fall_color_history.util.EmbeddedServerTestListener.withEmbeddedServerHttpClient
-import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -12,9 +11,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
-class LatestBTest : FunSpec({
-  listeners(EmbeddedServerTestListener)
-
+class LatestBTest : BFunSpec({
   test("no latest") {
     withEmbeddedServerHttpClient {
       get<HttpResponse>("/latest").apply {
