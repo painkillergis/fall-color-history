@@ -5,6 +5,7 @@ import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import kotlinx.serialization.json.JsonObject
 import org.slf4j.Logger
 
 fun Application.latestController(latestService: LatestService, log: Logger) =
@@ -19,7 +20,7 @@ fun Application.latestController(latestService: LatestService, log: Logger) =
     }
     put("/latest") {
       try {
-        latestService.put(call.receive())
+        latestService.put(call.receive<JsonObject>())
         call.respond(HttpStatusCode.NoContent)
       } catch (exception: Exception) {
         log.error("There was an error setting the latest", exception)

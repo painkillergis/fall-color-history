@@ -8,8 +8,8 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
 
 class LatestBTest : BFunSpec({
   test("no latest") {
@@ -23,16 +23,17 @@ class LatestBTest : BFunSpec({
 
   test("put latest") {
     withEmbeddedServerHttpClient {
+      val next = buildJsonObject { put("locations", buildJsonArray { }) }
       put<HttpResponse>("/latest") {
         contentType(ContentType.Application.Json)
-        body = mapOf("the" to "late latest")
+        body = next
       }.apply {
         status shouldBe HttpStatusCode.NoContent
       }
 
       get<HttpResponse>("/latest").apply {
         status shouldBe HttpStatusCode.OK
-        receive<JsonObject>() shouldBe buildJsonObject { put("the", "late latest") }
+        receive<JsonObject>() shouldBe next
       }
     }
   }
