@@ -2,7 +2,7 @@
 cd /home/arctair/ws/painkillergis/fall-color-history/scripts
 curl -sf https://maps2.dnr.state.mn.us/cgi-bin/fall_colors_json.cgi | \
   ./cgi2json | \
-  curl -sXPUT yagni:8081/latest \
-    -Hcontent-type=application/json \
+  curl -svXPUT ${1:-yagni:8081}/latest \
+    -Hcontent-type:application/json \
     -d @-
 cd -
