@@ -1,5 +1,7 @@
 package com.painkillergis.fall_color_history.latest
 
+import com.painkillergis.fall_color_history.Database.useConnection
+import com.painkillergis.fall_color_history.Database.useStatement
 import com.painkillergis.fall_color_history.history.HistoryService
 import com.painkillergis.fall_color_history.util.toJsonElement
 import kotlinx.serialization.decodeFromString
@@ -13,14 +15,6 @@ import java.sql.Statement
 class LatestService(
   private val historyService: HistoryService,
 ) {
-
-  private val connection = DriverManager.getConnection("jdbc:sqlite::memory:")
-
-  private fun <T> useConnection(block: Connection.() -> T) = block(connection)
-
-  private fun <T> useStatement(block: Statement.() -> T) =
-    useConnection { createStatement().use(block) }
-
   init {
     useStatement {
       execute("create table if not exists latest (id integer primary key, text content)")
