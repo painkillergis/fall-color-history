@@ -11,6 +11,7 @@ import io.mockk.verify
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import org.slf4j.Logger
@@ -49,23 +50,27 @@ class LatestControllerKtTest : FunSpec({
 
   test("put to service with next latest") {
     withTestController {
+      val latest = mapOf("the" to JsonPrimitive("late late latest"))
+
       handleRequest(HttpMethod.Put, "/latest") {
         addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-        setBody(Json.encodeToString(mapOf("locations" to emptyList<Unit>())))
+        setBody(Json.encodeToString(latest))
       }.apply {
         response.status() shouldBe HttpStatusCode.NoContent
       }
+
+      verify { latestService.put(latest) }
     }
   }
 
   test("put to service has error") {
-    val latest = mapOf("the" to JsonPrimitive("late late latest"))
-    val exception = RuntimeException("the message")
-    every { latestService.put(latest) } throws exception
     withTestController {
+      val exception = RuntimeException("the message")
+      every { latestService.put(any()) } throws exception
+
       handleRequest(HttpMethod.Put, "/latest") {
         addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-        setBody(Json.encodeToString(latest))
+        setBody(Json.encodeToString(emptyMap<String, JsonElement>()))
       }.apply {
         response.status() shouldBe HttpStatusCode.InternalServerError
       }
