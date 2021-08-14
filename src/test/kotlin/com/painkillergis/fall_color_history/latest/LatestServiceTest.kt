@@ -5,8 +5,6 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
 
 class LatestServiceTest : FunSpec({
   val historyService = mockk<HistoryService>(relaxed = true)
@@ -17,19 +15,15 @@ class LatestServiceTest : FunSpec({
   }
 
   test("put latest and notify history") {
-    val jsonObject = buildJsonObject { put("the", "late latest") }
+    val latest = mapOf("the" to "late latest")
+    latestService.put(latest)
 
-    latestService.apply {
-      put(jsonObject)
-      get() shouldBe jsonObject
-    }
-
-    verify { historyService.notify(jsonObject) }
+    latestService.get() shouldBe latest
+    verify { historyService.notify(latest) }
   }
 
   test("clear") {
-    latestService.put(buildJsonObject { put("the", "update to clear") })
-
+    latestService.put(mapOf("the" to "update to clear"))
     latestService.clear()
 
     latestService.get() shouldBe emptyMap()
