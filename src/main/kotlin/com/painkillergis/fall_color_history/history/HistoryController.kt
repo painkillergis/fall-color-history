@@ -10,7 +10,7 @@ fun Application.historyController(historyService: HistoryService, log: Logger) {
   routing {
     get("/history") {
       try {
-        call.respond(historyService.get())
+        call.respond(mapOf("history" to historyService.get()))
       } catch (exception: Exception) {
         log.error("There was an error getting history", exception)
         call.respond(HttpStatusCode.InternalServerError)

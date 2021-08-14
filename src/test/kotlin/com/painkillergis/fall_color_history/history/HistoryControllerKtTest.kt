@@ -24,11 +24,11 @@ class HistoryControllerKtTest : FunSpec({
 
   test("get history") {
     withTestController {
-      val history = buildJsonObject { }
+      val history = emptyList<Map<String, Any>>()
       every { historyService.get() } returns history
       handleRequest(HttpMethod.Get, "/history").apply {
         response.status() shouldBe HttpStatusCode.OK
-        Json.decodeFromString<JsonObject>(response.content!!) shouldBe history
+        Json.decodeFromString<JsonObject>(response.content!!) shouldBe mapOf("history" to history)
       }
     }
   }

@@ -12,18 +12,16 @@ class HistoryServiceTest : FunSpec({
   afterEach { historyService.clear() }
 
   test("default history") {
-    historyService.get() shouldBe mapOf("history" to emptyList<Map<String, Any>>())
+    historyService.get() shouldBe emptyList<Map<String, Any>>()
   }
 
   test("history after updates") {
     historyService.notify(mapOf("the" to "first update"))
     historyService.notify(mapOf("the" to "second update"))
 
-    historyService.get() shouldBe mapOf(
-      "history" to listOf(
-        mapOf("the" to "first update"),
-        mapOf("the" to "second update"),
-      )
+    historyService.get() shouldBe listOf(
+      mapOf("the" to "first update"),
+      mapOf("the" to "second update"),
     )
   }
 
@@ -31,10 +29,8 @@ class HistoryServiceTest : FunSpec({
     historyService.notify(mapOf("the" to "same update"))
     historyService.notify(mapOf("the" to "same update"))
 
-    historyService.get() shouldBe mapOf(
-      "history" to listOf(
-        mapOf("the" to "same update"),
-      )
+    historyService.get() shouldBe listOf(
+      mapOf("the" to "same update"),
     )
   }
 
@@ -43,12 +39,10 @@ class HistoryServiceTest : FunSpec({
     historyService.notify(mapOf("the" to "different update"))
     historyService.notify(mapOf("the" to "same update"))
 
-    historyService.get() shouldBe mapOf(
-      "history" to listOf(
-        mapOf("the" to "same update"),
-        mapOf("the" to "different update"),
-        mapOf("the" to "same update"),
-      )
+    historyService.get() shouldBe listOf(
+      mapOf("the" to "same update"),
+      mapOf("the" to "different update"),
+      mapOf("the" to "same update"),
     )
   }
 
@@ -56,6 +50,6 @@ class HistoryServiceTest : FunSpec({
     historyService.notify(mapOf("the" to "update"))
     historyService.clear()
 
-    historyService.get() shouldBe mapOf("history" to emptyList<Map<String, Any>>())
+    historyService.get() shouldBe emptyList<Map<String, Any>>()
   }
 })
