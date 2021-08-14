@@ -7,6 +7,12 @@
 Install the Kotest plugin via "Settings > Plugins"
 Set "Settings > Build, Execution, Deployment > Gradle Projects > Build and run > Run tests using" to "IntelliJ IDEA"
 
+### Running the application
+```sh
+$ ./gradlew run
+```
+The app will be started locally on port 8080. It will block the terminal from furthur input until it is stopped with CTRL+C.
+
 ### Building a jarfile
 ```sh
 ./gradlew clean shadowJar
