@@ -12,115 +12,50 @@ class HistoryServiceTest : FunSpec({
   afterEach { historyService.clear() }
 
   test("default history") {
-    historyService.get() shouldBe buildJsonObject {
-      putJsonArray("history") {}
-    }
+    historyService.get() shouldBe mapOf("history" to emptyList<Map<String, Any>>())
   }
 
   test("history after updates") {
-    historyService.notify(
-      buildJsonObject {
-        put("the", "first update")
-      }
-    )
+    historyService.notify(mapOf("the" to "first update"))
+    historyService.notify(mapOf("the" to "second update"))
 
-    historyService.notify(
-      buildJsonObject {
-        put("the", "second update")
-      }
+    historyService.get() shouldBe mapOf(
+      "history" to listOf(
+        mapOf("the" to "first update"),
+        mapOf("the" to "second update"),
+      )
     )
-
-    historyService.get() shouldBe buildJsonObject {
-      putJsonArray("history") {
-        add(
-          buildJsonObject {
-            put("the", "first update")
-          }
-        )
-        add(
-          buildJsonObject {
-            put("the", "second update")
-          }
-        )
-      }
-    }
   }
 
   test("discard duplicate updates") {
-    historyService.notify(
-      buildJsonObject {
-        put("the", "same update")
-      }
-    )
+    historyService.notify(mapOf("the" to "same update"))
+    historyService.notify(mapOf("the" to "same update"))
 
-    historyService.notify(
-      buildJsonObject {
-        put("the", "same update")
-      }
+    historyService.get() shouldBe mapOf(
+      "history" to listOf(
+        mapOf("the" to "same update"),
+      )
     )
-
-    historyService.get() shouldBe buildJsonObject {
-      putJsonArray("history") {
-        add(
-          buildJsonObject {
-            put("the", "same update")
-          }
-        )
-      }
-    }
   }
 
   test("preserve non-sequential duplicate updates") {
-    historyService.notify(
-      buildJsonObject {
-        put("the", "same update")
-      }
-    )
+    historyService.notify(mapOf("the" to "same update"))
+    historyService.notify(mapOf("the" to "different update"))
+    historyService.notify(mapOf("the" to "same update"))
 
-    historyService.notify(
-      buildJsonObject {
-        put("the", "different update")
-      }
+    historyService.get() shouldBe mapOf(
+      "history" to listOf(
+        mapOf("the" to "same update"),
+        mapOf("the" to "different update"),
+        mapOf("the" to "same update"),
+      )
     )
-
-    historyService.notify(
-      buildJsonObject {
-        put("the", "same update")
-      }
-    )
-
-    historyService.get() shouldBe buildJsonObject {
-      putJsonArray("history") {
-        add(
-          buildJsonObject {
-            put("the", "same update")
-          }
-        )
-        add(
-          buildJsonObject {
-            put("the", "different update")
-          }
-        )
-        add(
-          buildJsonObject {
-            put("the", "same update")
-          }
-        )
-      }
-    }
   }
 
   test("clear history") {
-    historyService.notify(
-      buildJsonObject {
-        put("the", "update")
-      }
-    )
-
+    historyService.notify(mapOf("the" to "update"))
     historyService.clear()
 
-    historyService.get() shouldBe buildJsonObject {
-      putJsonArray("history") { }
-    }
+    historyService.get() shouldBe mapOf("history" to emptyList<Map<String, Any>>())
   }
 })

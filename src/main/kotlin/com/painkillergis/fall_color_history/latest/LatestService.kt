@@ -10,7 +10,7 @@ class LatestService(
 
   fun get() = state
 
-  fun put(next: JsonObject) {
+  fun put(next: Map<String, Any>) {
     state = next
     historyService.notify(next)
   }

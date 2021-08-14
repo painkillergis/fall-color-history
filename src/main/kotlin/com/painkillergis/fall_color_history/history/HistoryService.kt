@@ -1,26 +1,17 @@
 package com.painkillergis.fall_color_history.history
 
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.buildJsonArray
-import kotlinx.serialization.json.buildJsonObject
-
 class HistoryService {
-  private var jsonArray = buildJsonArray { }
+  private var history = emptyList<Map<String, Any>>()
 
-  fun get(): JsonObject = buildJsonObject {
-    put("history", jsonArray)
-  }
+  fun get(): Map<String, Any> = mapOf("history" to history)
 
-  fun notify(update: JsonObject) {
-    jsonArray = buildJsonArray {
-      jsonArray.forEach(::add)
-      if (jsonArray.isEmpty() || jsonArray.last() != update) {
-        add(update)
-      }
-    }
+  fun notify(update: Map<String, Any>) {
+    history = if (history.isEmpty() || history.last() != update) {
+      history + update
+    } else history
   }
 
   fun clear() {
-    jsonArray = buildJsonArray { }
+    history = emptyList()
   }
 }
