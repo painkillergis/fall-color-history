@@ -50,6 +50,6 @@ class HistoryServiceTest : FunSpec({
     historyService.notify(mapOf("the" to "update"))
     historyService.clear()
 
-    historyService.get() shouldBe emptyList<Map<String, Any>>()
+    historyService.get() shouldBe emptyList()
   }
 })
