@@ -11,9 +11,8 @@ import io.mockk.verify
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.buildJsonArray
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import org.slf4j.Logger
 
 class LatestControllerKtTest : FunSpec({
@@ -28,12 +27,11 @@ class LatestControllerKtTest : FunSpec({
 
   test("latest from service") {
     withTestController {
-      every { latestService.get() } returns mapOf("the" to "late latest")
+      val latest = mapOf("the" to JsonPrimitive("late latest"))
+      every { latestService.get() } returns latest
       handleRequest(HttpMethod.Get, "/latest").apply {
         response.status() shouldBe HttpStatusCode.OK
-        Json.decodeFromString<Map<String, String>>(response.content!!) shouldBe mapOf(
-          "the" to "late latest",
-        )
+        Json.decodeFromString<JsonObject>(response.content!!) shouldBe latest
       }
     }
   }
@@ -53,13 +51,7 @@ class LatestControllerKtTest : FunSpec({
     withTestController {
       handleRequest(HttpMethod.Put, "/latest") {
         addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-        setBody(
-          Json.encodeToString(
-            buildJsonObject {
-              put("locations", buildJsonArray { })
-            }
-          )
-        )
+        setBody(Json.encodeToString(mapOf("locations" to emptyList<Unit>())))
       }.apply {
         response.status() shouldBe HttpStatusCode.NoContent
       }
@@ -67,13 +59,13 @@ class LatestControllerKtTest : FunSpec({
   }
 
   test("put to service has error") {
-    val jsonObject = buildJsonObject { put("the", "late late latest") }
+    val latest = mapOf("the" to JsonPrimitive("late late latest"))
     val exception = RuntimeException("the message")
-    every { latestService.put(jsonObject) } throws exception
+    every { latestService.put(latest) } throws exception
     withTestController {
       handleRequest(HttpMethod.Put, "/latest") {
         addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-        setBody(Json.encodeToString(jsonObject))
+        setBody(Json.encodeToString(latest))
       }.apply {
         response.status() shouldBe HttpStatusCode.InternalServerError
       }
