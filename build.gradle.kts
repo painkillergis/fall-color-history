@@ -26,8 +26,6 @@ dependencies {
   implementation("io.ktor:ktor-serialization:+")
   implementation("io.ktor:ktor-server-core:+")
   implementation("io.ktor:ktor-server-netty:+")
-  implementation("org.jetbrains.exposed:exposed-core:+")
-  implementation("org.jetbrains.exposed:exposed-jdbc:+")
   implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:+")
   runtimeOnly("org.xerial:sqlite-jdbc:+")
   testImplementation("io.kotest:kotest-assertions-core:+")

@@ -1,26 +1,51 @@
 package com.painkillergis.fall_color_history.latest
 
 import com.painkillergis.fall_color_history.history.HistoryService
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
-import org.jetbrains.exposed.sql.Database
+import java.sql.Connection
+import java.sql.DriverManager
+import java.sql.Statement
 
 class LatestService(
   private val historyService: HistoryService,
 ) {
+
+  private val connection = DriverManager.getConnection("jdbc:sqlite::memory:")
+
+  private fun <T> useConnection(block: Connection.() -> T) = block(connection)
+
+  private fun <T> useStatement(block: Statement.() -> T) =
+    useConnection { createStatement().use(block) }
+
   init {
-    Database.connect("jdbc:sqlite:file:fall_color_history?mode=memory&cache=shared", "org.sqlite.JDBC")
+    useStatement {
+      execute("create table if not exists latest (text content)")
+    }
   }
 
-  private var state = emptyMap<String, Any>()
+  fun get(): Map<String, Any> = useStatement { getAll().firstOrNull() ?: emptyMap() }
 
-  fun get() = state
+  private fun getAll() = useStatement {
+    val results = mutableListOf<JsonObject>()
+    val resultSet = executeQuery("select * from latest")
+    while (resultSet.next()) {
+      results.add(Json.decodeFromString(resultSet.getString(1)))
+    }
+    results
+  }
 
   fun put(next: Map<String, Any>) {
-    state = next
+    useConnection {
+      prepareStatement("insert into latest (text) values (?)").use {
+        it.setString(1, Json.encodeToString(next))
+        it.executeUpdate()
+      }
+    }
     historyService.notify(next)
   }
 
-  fun clear() {
-    state = emptyMap()
-  }
+  fun clear() = useStatement { execute("delete from latest") }
 }
