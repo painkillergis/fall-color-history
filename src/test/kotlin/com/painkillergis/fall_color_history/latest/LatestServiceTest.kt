@@ -1,5 +1,6 @@
 package com.painkillergis.fall_color_history.latest
 
+import com.painkillergis.fall_color_history.Database
 import com.painkillergis.fall_color_history.history.HistoryService
 import com.painkillergis.fall_color_history.util.toJsonElement
 import io.kotest.core.spec.style.FunSpec
@@ -9,7 +10,7 @@ import io.mockk.verify
 
 class LatestServiceTest : FunSpec({
   val historyService = mockk<HistoryService>(relaxed = true)
-  val latestService = LatestService(historyService)
+  val latestService = LatestService(historyService, Database())
 
   afterEach {
     latestService.clear()

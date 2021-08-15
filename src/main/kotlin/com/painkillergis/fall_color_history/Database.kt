@@ -4,8 +4,8 @@ import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.Statement
 
-object Database {
-  private val connection = DriverManager.getConnection("jdbc:sqlite::memory:")
+class Database(connectionString: String = "jdbc:sqlite::memory:") {
+  private val connection = DriverManager.getConnection(connectionString)
 
   fun <T> useConnection(block: Connection.() -> T) = block(connection)
 

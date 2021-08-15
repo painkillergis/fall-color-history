@@ -1,5 +1,6 @@
 package com.painkillergis.fall_color_history.history
 
+import com.painkillergis.fall_color_history.Database
 import com.painkillergis.fall_color_history.util.toJsonElement
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -8,7 +9,7 @@ import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 
 class HistoryServiceTest : FunSpec({
-  val historyService = HistoryService()
+  val historyService = HistoryService(Database())
 
   afterEach { historyService.clear() }
 
