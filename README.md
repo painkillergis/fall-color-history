@@ -21,11 +21,11 @@ A jarfile named `fall-color-history.jar` will be placed in `build/libs`
 
 ### Running a jarfile
 ```sh
-$ java -jar build/libs/fall-color-history.jar
+$ SQLITE_CONNECTION=/tmp/fall.sqlite java -jar build/libs/fall-color-history.jar
 $ curl -s localhost:8080/version
 {"version":"probably the version"}
 ```
-This runs the application as an HTTP server on port 8080.
+This runs the application as an HTTP server on port 8080 and sqlite database at /tmp/fall.sqlite.
 
 #### Running with a different port
 ```sh
