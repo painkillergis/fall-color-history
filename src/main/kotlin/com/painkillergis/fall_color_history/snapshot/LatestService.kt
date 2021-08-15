@@ -1,7 +1,6 @@
-package com.painkillergis.fall_color_history.latest
+package com.painkillergis.fall_color_history.snapshot
 
 import com.painkillergis.fall_color_history.Database
-import com.painkillergis.fall_color_history.history.HistoryService
 import com.painkillergis.fall_color_history.util.toJsonElement
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString

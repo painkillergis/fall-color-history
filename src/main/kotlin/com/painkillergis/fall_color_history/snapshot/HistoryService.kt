@@ -1,4 +1,4 @@
-package com.painkillergis.fall_color_history.history
+package com.painkillergis.fall_color_history.snapshot
 
 import com.painkillergis.fall_color_history.Database
 import com.painkillergis.fall_color_history.util.toJsonElement

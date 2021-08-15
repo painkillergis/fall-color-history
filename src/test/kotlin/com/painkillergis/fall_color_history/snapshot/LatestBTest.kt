@@ -1,4 +1,4 @@
-package com.painkillergis.fall_color_history.latest
+package com.painkillergis.fall_color_history.snapshot
 
 import com.painkillergis.fall_color_history.util.BFunSpec
 import io.kotest.matchers.shouldBe

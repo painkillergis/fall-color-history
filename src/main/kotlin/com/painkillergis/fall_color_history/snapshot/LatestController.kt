@@ -1,4 +1,4 @@
-package com.painkillergis.fall_color_history.latest
+package com.painkillergis.fall_color_history.snapshot
 
 import io.ktor.application.*
 import io.ktor.http.*

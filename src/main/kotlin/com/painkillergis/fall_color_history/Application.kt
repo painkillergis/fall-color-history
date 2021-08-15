@@ -1,9 +1,9 @@
 package com.painkillergis.fall_color_history
 
-import com.painkillergis.fall_color_history.history.HistoryService
-import com.painkillergis.fall_color_history.history.historyController
-import com.painkillergis.fall_color_history.latest.LatestService
-import com.painkillergis.fall_color_history.latest.latestController
+import com.painkillergis.fall_color_history.snapshot.HistoryService
+import com.painkillergis.fall_color_history.snapshot.historyController
+import com.painkillergis.fall_color_history.snapshot.LatestService
+import com.painkillergis.fall_color_history.snapshot.latestController
 import com.painkillergis.fall_color_history.version.VersionService
 import com.painkillergis.fall_color_history.version.versionController
 import io.ktor.application.*

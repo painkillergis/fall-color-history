@@ -1,4 +1,4 @@
-package com.painkillergis.fall_color_history.latest
+package com.painkillergis.fall_color_history.snapshot
 
 import com.painkillergis.fall_color_history.globalModules
 import io.kotest.core.spec.style.FunSpec
