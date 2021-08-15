@@ -2,25 +2,31 @@ package com.painkillergis.fall_color_history.snapshot
 
 import com.painkillergis.fall_color_history.Database
 import com.painkillergis.fall_color_history.util.toJsonElement
+import com.painkillergis.fall_color_history.util.toJsonObject
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
 
 class SnapshotServiceTest : FunSpec({
-  val snapshotService = SnapshotService(Database())
+  val timestampService = mockk<TimestampService>() {
+    every { getTimestamp() } returns "the timestamp"
+  }
+  val snapshotService = SnapshotService(Database(), timestampService)
 
   afterEach {
     snapshotService.clear()
   }
 
   test("default latest") {
-    snapshotService.getLatest() shouldBe emptyMap()
+    snapshotService.getLatest() shouldBe SnapshotContainer()
   }
 
   test("replace default latest") {
     val latest = mapOf("the" to "late latest")
     snapshotService.replaceLatest(latest)
 
-    snapshotService.getLatest() shouldBe latest.toJsonElement()
+    snapshotService.getLatest() shouldBe SnapshotContainer("the timestamp", latest)
     snapshotService.getHistory() shouldBe listOf(latest.toJsonElement())
   }
 
@@ -30,7 +36,7 @@ class SnapshotServiceTest : FunSpec({
     snapshotService.replaceLatest(oldest)
     snapshotService.replaceLatest(latest)
 
-    snapshotService.getLatest() shouldBe latest.toJsonElement()
+    snapshotService.getLatest() shouldBe SnapshotContainer("the timestamp", latest)
     snapshotService.getHistory() shouldBe listOf(
       oldest,
       latest,
@@ -41,7 +47,7 @@ class SnapshotServiceTest : FunSpec({
     snapshotService.replaceLatest(mapOf("the" to "update to clear"))
     snapshotService.clear()
 
-    snapshotService.getLatest() shouldBe emptyMap()
+    snapshotService.getLatest() shouldBe SnapshotContainer()
     snapshotService.getHistory() shouldBe emptyList<Unit>()
   }
 

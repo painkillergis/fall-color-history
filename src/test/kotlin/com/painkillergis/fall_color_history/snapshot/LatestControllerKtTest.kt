@@ -2,6 +2,7 @@ package com.painkillergis.fall_color_history.snapshot
 
 import com.painkillergis.fall_color_history.globalModules
 import com.painkillergis.fall_color_history.util.toJsonElement
+import com.painkillergis.fall_color_history.util.toJsonObject
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.ktor.http.*
@@ -28,11 +29,14 @@ class LatestControllerKtTest : FunSpec({
 
   test("get latest") {
     withTestController {
-      val latest = mapOf("the" to JsonPrimitive("late latest"))
-      every { snapshotService.getLatest() } returns latest
+      val latest = mapOf("the" to "late latest")
+      every { snapshotService.getLatest() } returns SnapshotContainer("timestamp", latest)
       handleRequest(HttpMethod.Get, "/snapshots/latest").apply {
         response.status() shouldBe HttpStatusCode.OK
-        Json.decodeFromString<JsonObject>(response.content!!) shouldBe latest
+        Json.decodeFromString<JsonObject>(response.content!!) shouldBe mapOf(
+          "timestamp" to "timestamp",
+          "content" to latest,
+        ).toJsonObject()
       }
     }
   }

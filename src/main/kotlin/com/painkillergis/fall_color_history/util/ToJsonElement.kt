@@ -8,11 +8,14 @@ fun Any?.toJsonElement(): JsonElement =
     is String -> JsonPrimitive(this)
     is Number -> JsonPrimitive(this)
     is Boolean -> JsonPrimitive(this)
-    is Map<*, *> -> {
-      JsonObject((this as Map<String, Any>).mapValues { (_, value) -> value.toJsonElement() })
-    }
+    is Map<*, *> -> toJsonObject()
     is List<*> -> JsonArray(map { it?.toJsonElement() ?: JsonNull })
     null -> JsonNull
     else -> throw Exception("Cannot convert unknown type $javaClass to JsonElement")
   }
 
+fun Map<*, *>.toJsonObject(): JsonObject =
+  JsonObject(
+    mapKeys { it.key as String }
+      .mapValues { it.value.toJsonElement() }
+  )

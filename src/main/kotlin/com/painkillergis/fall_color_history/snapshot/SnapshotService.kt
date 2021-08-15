@@ -9,36 +9,44 @@ import kotlinx.serialization.json.JsonObject
 import java.sql.ResultSet
 
 class SnapshotService(
-  private val database: Database,
+  private val database: Database = Database(),
+  private val timestampService: TimestampService = TimestampService(),
 ) {
   init {
     database.useStatement {
-      execute("create table if not exists history (document text)")
+      execute("create table if not exists history (document text, timestamp text)")
     }
   }
 
   fun getHistory(): List<Map<String, Any>> = database.useStatement {
-    executeQuery("select * from history order by rowid")
+    executeQuery("select document, timestamp from history order by rowid")
       .let(::deserializeResultSet)
+      .map { it.content }
   }
 
-  fun getLatest(): Map<String, Any> = database.useStatement {
-    executeQuery("select * from history order by rowid desc limit 1")
+  fun getLatest(): SnapshotContainer = database.useStatement {
+    executeQuery("select document, timestamp from history order by rowid desc limit 1")
       .let(::deserializeResultSet)
-      .firstOrNull() ?: emptyMap()
+      .firstOrNull() ?: SnapshotContainer()
   }
 
   private fun deserializeResultSet(resultSet: ResultSet) =
-    mutableListOf<JsonObject>().apply {
+    mutableListOf<SnapshotContainer>().apply {
       while (resultSet.next()) {
-        add(Json.decodeFromString(resultSet.getString(1)))
+        add(
+          SnapshotContainer(
+            resultSet.getString(2),
+            Json.decodeFromString(resultSet.getString(1)),
+          )
+        )
       }
     }
 
   fun replaceLatest(latest: Map<String, Any>) = database.useConnection {
-    if (getLatest() != latest.toJsonElement()) {
-      prepareStatement("insert into history (document) values (?)").use {
+    if (getLatest().content != latest.toJsonElement()) {
+      prepareStatement("insert into history (document, timestamp) values (?, ?)").use {
         it.setString(1, Json.encodeToString(latest.toJsonElement()))
+        it.setString(2, timestampService.getTimestamp())
         it.executeUpdate()
       }
     }
