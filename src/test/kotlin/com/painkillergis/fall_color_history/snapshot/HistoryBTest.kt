@@ -1,6 +1,7 @@
 package com.painkillergis.fall_color_history.snapshot
 
 import com.painkillergis.fall_color_history.util.BFunSpec
+import com.painkillergis.fall_color_history.util.toJsonElement
 import io.kotest.matchers.shouldBe
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -10,71 +11,55 @@ import kotlinx.serialization.json.*
 
 class HistoryBTest : BFunSpec({ httpClient ->
   afterEach {
-    httpClient.delete<Unit>("/latest")
-    httpClient.delete<Unit>("/history")
+    httpClient.delete<Unit>("/snapshots")
+    httpClient.delete<Unit>("/snapshots/latest")
   }
 
   test("no history") {
-    httpClient.get<HttpResponse>("/history").apply {
+    httpClient.get<HttpResponse>("/snapshots").apply {
       status shouldBe HttpStatusCode.OK
-      receive<JsonObject>() shouldBe buildJsonObject {
-        put("history", buildJsonArray { })
-      }
+      receive<JsonObject>() shouldBe mapOf("history" to emptyList<Unit>())
     }
   }
 
   test("history after updates") {
-    httpClient.put<Unit>("/latest") {
+    httpClient.put<Unit>("/snapshots/latest") {
       contentType(ContentType.Application.Json)
-      body = buildJsonObject {
-        put("the", "first update")
-      }
+      body = mapOf("the" to "first update")
     }
 
-    httpClient.put<Unit>("/latest") {
+    httpClient.put<Unit>("/snapshots/latest") {
       contentType(ContentType.Application.Json)
-      body = buildJsonObject {
-        put("the", "second update")
-      }
+      body = mapOf("the" to "second update")
     }
 
-    httpClient.get<HttpResponse>("/history").apply {
+    httpClient.get<HttpResponse>("/snapshots").apply {
       status shouldBe HttpStatusCode.OK
-      receive<JsonObject>() shouldBe buildJsonObject {
-        putJsonArray("history") {
-          addJsonObject {
-            put("the", "first update")
-          }
-          addJsonObject {
-            put("the", "second update")
-          }
-        }
-      }
+      receive<JsonObject>() shouldBe mapOf(
+        "history" to listOf(
+          mapOf("the" to "first update"),
+          mapOf("the" to "second update"),
+        )
+      ).toJsonElement()
     }
   }
 
   test("discard duplicate updates") {
-    httpClient.put<Unit>("/latest") {
+    httpClient.put<Unit>("/snapshots/latest") {
       contentType(ContentType.Application.Json)
-      body = buildJsonObject {
-        put("the", "same update")
-      }
+      body = mapOf("the" to "same update")
     }
 
-    httpClient.put<Unit>("/latest") {
+    httpClient.put<Unit>("/snapshots/latest") {
       contentType(ContentType.Application.Json)
-      body = buildJsonObject {
-        put("the", "same update")
-      }
+      body = mapOf("the" to "same update")
     }
 
-    httpClient.get<JsonObject>("/history") shouldBe
-        buildJsonObject {
-          putJsonArray("history") {
-            addJsonObject {
-              put("the", "same update")
-            }
-          }
-        }
+    httpClient.get<JsonObject>("/snapshots") shouldBe
+      mapOf(
+        "history" to listOf(
+          mapOf("the" to "same update")
+        )
+      ).toJsonElement()
   }
 })

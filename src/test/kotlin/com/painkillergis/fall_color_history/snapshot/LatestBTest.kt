@@ -12,27 +12,27 @@ import kotlinx.serialization.json.buildJsonObject
 
 class LatestBTest : BFunSpec({ httpClient ->
   afterEach {
-    httpClient.delete<Unit>("/latest")
-    httpClient.delete<Unit>("/history")
+    httpClient.delete<Unit>("/snapshots")
+    httpClient.delete<Unit>("/snapshots/latest")
   }
 
   test("no latest") {
-    httpClient.get<HttpResponse>("/latest").apply {
+    httpClient.get<HttpResponse>("/snapshots/latest").apply {
       status shouldBe HttpStatusCode.OK
       receive<JsonObject>() shouldBe emptyMap()
     }
   }
 
   test("put latest") {
-    val next = buildJsonObject { put("locations", buildJsonArray { }) }
-    httpClient.put<HttpResponse>("/latest") {
+    val next = mapOf("locations" to emptyList<Unit>())
+    httpClient.put<HttpResponse>("/snapshots/latest") {
       contentType(ContentType.Application.Json)
       body = next
     }.apply {
       status shouldBe HttpStatusCode.NoContent
     }
 
-    httpClient.get<HttpResponse>("/latest").apply {
+    httpClient.get<HttpResponse>("/snapshots/latest").apply {
       status shouldBe HttpStatusCode.OK
       receive<JsonObject>() shouldBe next
     }

@@ -26,7 +26,7 @@ class HistoryControllerKtTest : FunSpec({
     withTestController {
       val history = emptyList<Map<String, Any>>()
       every { historyService.get() } returns history
-      handleRequest(HttpMethod.Get, "/history").apply {
+      handleRequest(HttpMethod.Get, "/snapshots").apply {
         response.status() shouldBe HttpStatusCode.OK
         Json.decodeFromString<JsonObject>(response.content!!) shouldBe mapOf("history" to history)
       }
@@ -37,18 +37,14 @@ class HistoryControllerKtTest : FunSpec({
     withTestController {
       val exception = RuntimeException("the message")
       every { historyService.get() } throws exception
-      handleRequest(HttpMethod.Get, "/history").apply {
-        response.status() shouldBe HttpStatusCode.InternalServerError
-      }
+      handleRequest(HttpMethod.Get, "/snapshots").response.status() shouldBe HttpStatusCode.InternalServerError
       verify { log.error("There was an error getting history", exception) }
     }
   }
 
   test("delete history") {
     withTestController {
-      handleRequest(HttpMethod.Delete, "/history").apply {
-        response.status() shouldBe HttpStatusCode.NoContent
-      }
+      handleRequest(HttpMethod.Delete, "/snapshots").response.status() shouldBe HttpStatusCode.NoContent
     }
   }
 
@@ -56,9 +52,7 @@ class HistoryControllerKtTest : FunSpec({
     withTestController {
       val exception = RuntimeException("the message")
       every { historyService.clear() } throws exception
-      handleRequest(HttpMethod.Delete, "/history").apply {
-        response.status() shouldBe HttpStatusCode.InternalServerError
-      }
+      handleRequest(HttpMethod.Delete, "/snapshots").response.status() shouldBe HttpStatusCode.InternalServerError
       verify { log.error("There was an error clearing history", exception) }
     }
   }

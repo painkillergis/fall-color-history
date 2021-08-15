@@ -11,7 +11,7 @@ fun Application.historyController(
   log: Logger,
 ) {
   routing {
-    get("/history") {
+    get("/snapshots") {
       try {
         call.respond(mapOf("history" to historyService.get()))
       } catch (exception: Exception) {
@@ -19,7 +19,7 @@ fun Application.historyController(
         call.respond(HttpStatusCode.InternalServerError)
       }
     }
-    delete("/history") {
+    delete("/snapshots") {
       try {
         historyService.clear()
         call.respond(HttpStatusCode.NoContent)

@@ -13,7 +13,7 @@ fun Application.latestController(
   log: Logger,
 ) =
   routing {
-    get("/latest") {
+    get("/snapshots/latest") {
       try {
         call.respond(latestService.get())
       } catch (exception: Exception) {
@@ -21,7 +21,7 @@ fun Application.latestController(
         call.respond(HttpStatusCode.InternalServerError)
       }
     }
-    put("/latest") {
+    put("/snapshots/latest") {
       try {
         latestService.put(call.receive<JsonObject>())
         call.respond(HttpStatusCode.NoContent)
@@ -30,7 +30,7 @@ fun Application.latestController(
         call.respond(HttpStatusCode.InternalServerError)
       }
     }
-    delete("/latest") {
+    delete("/snapshots/latest") {
       try {
         latestService.clear()
         call.respond(HttpStatusCode.NoContent)

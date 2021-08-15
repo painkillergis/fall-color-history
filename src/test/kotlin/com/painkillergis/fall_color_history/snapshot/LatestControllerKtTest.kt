@@ -26,33 +26,33 @@ class LatestControllerKtTest : FunSpec({
       latestController(latestService, log)
     }, block)
 
-  test("latest from service") {
+  test("get latest") {
     withTestController {
       val latest = mapOf("the" to JsonPrimitive("late latest"))
       every { latestService.get() } returns latest
-      handleRequest(HttpMethod.Get, "/latest").apply {
+      handleRequest(HttpMethod.Get, "/snapshots/latest").apply {
         response.status() shouldBe HttpStatusCode.OK
         Json.decodeFromString<JsonObject>(response.content!!) shouldBe latest
       }
     }
   }
 
-  test("latest from service has error") {
+  test("get latest has error") {
     withTestController {
       val exception = RuntimeException("the message")
       every { latestService.get() } throws exception
-      handleRequest(HttpMethod.Get, "/latest").apply {
+      handleRequest(HttpMethod.Get, "/snapshots/latest").apply {
         response.status() shouldBe HttpStatusCode.InternalServerError
       }
       verify { log.error("There was an error getting the latest", exception) }
     }
   }
 
-  test("put to service with next latest") {
+  test("replace latest") {
     withTestController {
       val latest = mapOf("the" to JsonPrimitive("late late latest"))
 
-      handleRequest(HttpMethod.Put, "/latest") {
+      handleRequest(HttpMethod.Put, "/snapshots/latest") {
         addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
         setBody(Json.encodeToString(latest))
       }.apply {
@@ -63,12 +63,12 @@ class LatestControllerKtTest : FunSpec({
     }
   }
 
-  test("put to service has error") {
+  test("replace latest has error") {
     withTestController {
       val exception = RuntimeException("the message")
       every { latestService.put(any()) } throws exception
 
-      handleRequest(HttpMethod.Put, "/latest") {
+      handleRequest(HttpMethod.Put, "/snapshots/latest") {
         addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
         setBody(Json.encodeToString(emptyMap<String, JsonElement>()))
       }.apply {
@@ -80,7 +80,7 @@ class LatestControllerKtTest : FunSpec({
 
   test("clear latest") {
     withTestController {
-      handleRequest(HttpMethod.Delete, "/latest").apply {
+      handleRequest(HttpMethod.Delete, "/snapshots/latest").apply {
         response.status() shouldBe HttpStatusCode.NoContent
       }
     }
@@ -90,7 +90,7 @@ class LatestControllerKtTest : FunSpec({
     val exception = RuntimeException("the message")
     every { latestService.clear() } throws exception
     withTestController {
-      handleRequest(HttpMethod.Delete, "/latest").apply {
+      handleRequest(HttpMethod.Delete, "/snapshots/latest").apply {
         response.status() shouldBe HttpStatusCode.InternalServerError
       }
       verify { log.error("There was an error clearing the latest", exception) }
