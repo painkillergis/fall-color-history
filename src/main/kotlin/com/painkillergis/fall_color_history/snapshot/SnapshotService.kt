@@ -16,7 +16,14 @@ class SnapshotService(
     }
   }
 
-  fun clear() = database.useStatement { execute("delete from history") }
+  fun getHistory(): List<Map<String, Any>> = database.useStatement {
+    val results = mutableListOf<JsonObject>()
+    val resultSet = executeQuery("select * from history order by rowid")
+    while (resultSet.next()) {
+      results.add(Json.decodeFromString(resultSet.getString(1)))
+    }
+    results
+  }
 
   fun getLatest(): Map<String, Any> = database.useStatement { getHistory().lastOrNull() ?: emptyMap() }
 
@@ -29,12 +36,5 @@ class SnapshotService(
     }
   }
 
-  fun getHistory(): List<Map<String, Any>> = database.useStatement {
-    val results = mutableListOf<JsonObject>()
-    val resultSet = executeQuery("select * from history order by rowid")
-    while (resultSet.next()) {
-      results.add(Json.decodeFromString(resultSet.getString(1)))
-    }
-    results
-  }
+  fun clear() = database.useStatement { execute("delete from history") }
 }
