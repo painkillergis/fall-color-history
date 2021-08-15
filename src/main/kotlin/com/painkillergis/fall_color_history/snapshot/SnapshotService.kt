@@ -6,6 +6,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import java.sql.ResultSet
 
 class SnapshotService(
   private val database: Database,
@@ -17,15 +18,22 @@ class SnapshotService(
   }
 
   fun getHistory(): List<Map<String, Any>> = database.useStatement {
-    val results = mutableListOf<JsonObject>()
-    val resultSet = executeQuery("select * from history order by rowid")
-    while (resultSet.next()) {
-      results.add(Json.decodeFromString(resultSet.getString(1)))
-    }
-    results
+    executeQuery("select * from history order by rowid")
+      .let(::deserializeResultSet)
   }
 
-  fun getLatest(): Map<String, Any> = database.useStatement { getHistory().lastOrNull() ?: emptyMap() }
+  fun getLatest(): Map<String, Any> = database.useStatement {
+    executeQuery("select * from history order by rowid desc limit 1")
+      .let(::deserializeResultSet)
+      .firstOrNull() ?: emptyMap()
+  }
+
+  private fun deserializeResultSet(resultSet: ResultSet) =
+    mutableListOf<JsonObject>().apply {
+      while (resultSet.next()) {
+        add(Json.decodeFromString(resultSet.getString(1)))
+      }
+    }
 
   fun replaceLatest(latest: Map<String, Any>) = database.useConnection {
     if (getLatest() != latest.toJsonElement()) {
