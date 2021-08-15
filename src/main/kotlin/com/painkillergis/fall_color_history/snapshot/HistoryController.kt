@@ -7,13 +7,13 @@ import io.ktor.routing.*
 import org.slf4j.Logger
 
 fun Application.historyController(
-  historyService: HistoryService,
+  snapshotService: SnapshotService,
   log: Logger,
 ) {
   routing {
     get("/snapshots") {
       try {
-        call.respond(mapOf("history" to historyService.get()))
+        call.respond(mapOf("history" to snapshotService.getHistory()))
       } catch (exception: Exception) {
         log.error("There was an error getting history", exception)
         call.respond(HttpStatusCode.InternalServerError)
@@ -21,7 +21,7 @@ fun Application.historyController(
     }
     delete("/snapshots") {
       try {
-        historyService.clear()
+        snapshotService.clear()
         call.respond(HttpStatusCode.NoContent)
       } catch (exception: Exception) {
         log.error("There was an error clearing history", exception)

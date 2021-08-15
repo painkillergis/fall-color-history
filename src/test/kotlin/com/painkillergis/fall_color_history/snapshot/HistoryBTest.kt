@@ -12,7 +12,6 @@ import kotlinx.serialization.json.*
 class HistoryBTest : BFunSpec({ httpClient ->
   afterEach {
     httpClient.delete<Unit>("/snapshots")
-    httpClient.delete<Unit>("/snapshots/latest")
   }
 
   test("no history") {

@@ -13,7 +13,6 @@ import kotlinx.serialization.json.buildJsonObject
 class LatestBTest : BFunSpec({ httpClient ->
   afterEach {
     httpClient.delete<Unit>("/snapshots")
-    httpClient.delete<Unit>("/snapshots/latest")
   }
 
   test("no latest") {

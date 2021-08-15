@@ -9,13 +9,13 @@ import kotlinx.serialization.json.JsonObject
 import org.slf4j.Logger
 
 fun Application.latestController(
-  latestService: LatestService,
+  snapshotService: SnapshotService,
   log: Logger,
 ) =
   routing {
     get("/snapshots/latest") {
       try {
-        call.respond(latestService.get())
+        call.respond(snapshotService.getLatest())
       } catch (exception: Exception) {
         log.error("There was an error getting the latest", exception)
         call.respond(HttpStatusCode.InternalServerError)
@@ -23,19 +23,10 @@ fun Application.latestController(
     }
     put("/snapshots/latest") {
       try {
-        latestService.put(call.receive<JsonObject>())
+        snapshotService.replaceLatest(call.receive<JsonObject>())
         call.respond(HttpStatusCode.NoContent)
       } catch (exception: Exception) {
         log.error("There was an error setting the latest", exception)
-        call.respond(HttpStatusCode.InternalServerError)
-      }
-    }
-    delete("/snapshots/latest") {
-      try {
-        latestService.clear()
-        call.respond(HttpStatusCode.NoContent)
-      } catch (exception: Exception) {
-        log.error("There was an error clearing the latest", exception)
         call.respond(HttpStatusCode.InternalServerError)
       }
     }
