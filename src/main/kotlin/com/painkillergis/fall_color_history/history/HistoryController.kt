@@ -6,7 +6,10 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import org.slf4j.Logger
 
-fun Application.historyController(historyService: HistoryService, log: Logger) {
+fun Application.historyController(
+  historyService: HistoryService,
+  log: Logger,
+) {
   routing {
     get("/history") {
       try {

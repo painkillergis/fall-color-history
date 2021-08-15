@@ -8,7 +8,10 @@ import io.ktor.routing.*
 import kotlinx.serialization.json.JsonObject
 import org.slf4j.Logger
 
-fun Application.latestController(latestService: LatestService, log: Logger) =
+fun Application.latestController(
+  latestService: LatestService,
+  log: Logger,
+) =
   routing {
     get("/latest") {
       try {

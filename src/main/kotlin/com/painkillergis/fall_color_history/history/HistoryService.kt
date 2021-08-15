@@ -7,7 +7,9 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 
-class HistoryService(private val database: Database) {
+class HistoryService(
+  private val database: Database,
+) {
   init {
     database.useStatement {
       execute("create table if not exists history (document text)")
