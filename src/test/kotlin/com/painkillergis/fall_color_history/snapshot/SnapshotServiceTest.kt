@@ -1,18 +1,17 @@
 package com.painkillergis.fall_color_history.snapshot
 
 import com.painkillergis.fall_color_history.Database
-import com.painkillergis.fall_color_history.util.toJsonElement
-import com.painkillergis.fall_color_history.util.toJsonObject
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 
 class SnapshotServiceTest : FunSpec({
-  val timestampService = mockk<TimestampService>() {
-    every { getTimestamp() } returns "the timestamp"
-  }
+  val timestampService = mockk<TimestampService>()
   val snapshotService = SnapshotService(Database(), timestampService)
+  beforeEach {
+    every { timestampService.getTimestamp() } returnsMany listOf("first", "second", "third")
+  }
 
   afterEach {
     snapshotService.clear()
@@ -26,8 +25,8 @@ class SnapshotServiceTest : FunSpec({
     val latest = mapOf("the" to "late latest")
     snapshotService.replaceLatest(latest)
 
-    snapshotService.getLatest() shouldBe SnapshotContainer("the timestamp", latest)
-    snapshotService.getHistory() shouldBe listOf(latest.toJsonElement())
+    snapshotService.getLatest() shouldBe SnapshotContainer("first", latest)
+    snapshotService.getHistory() shouldBe listOf(SnapshotContainer("first", latest))
   }
 
   test("replace latest") {
@@ -36,11 +35,11 @@ class SnapshotServiceTest : FunSpec({
     snapshotService.replaceLatest(oldest)
     snapshotService.replaceLatest(latest)
 
-    snapshotService.getLatest() shouldBe SnapshotContainer("the timestamp", latest)
+    snapshotService.getLatest() shouldBe SnapshotContainer("second", latest)
     snapshotService.getHistory() shouldBe listOf(
-      oldest,
-      latest,
-    ).toJsonElement()
+      SnapshotContainer("first", oldest),
+      SnapshotContainer("second", latest),
+    )
   }
 
   test("clear") {
@@ -56,8 +55,8 @@ class SnapshotServiceTest : FunSpec({
     snapshotService.replaceLatest(mapOf("the" to "same update"))
 
     snapshotService.getHistory() shouldBe listOf(
-      mapOf("the" to "same update"),
-    ).toJsonElement()
+      SnapshotContainer("first", mapOf("the" to "same update")),
+    )
   }
 
   test("preserve non-sequential duplicate updates") {
@@ -66,9 +65,9 @@ class SnapshotServiceTest : FunSpec({
     snapshotService.replaceLatest(mapOf("the" to "same update"))
 
     snapshotService.getHistory() shouldBe listOf(
-      mapOf("the" to "same update"),
-      mapOf("the" to "different update"),
-      mapOf("the" to "same update"),
-    ).toJsonElement()
+      SnapshotContainer("first", mapOf("the" to "same update")),
+      SnapshotContainer("second", mapOf("the" to "different update")),
+      SnapshotContainer("third", mapOf("the" to "same update")),
+    )
   }
 })

@@ -5,7 +5,6 @@ import com.painkillergis.fall_color_history.util.toJsonElement
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
 import java.sql.ResultSet
 
 class SnapshotService(
@@ -18,10 +17,9 @@ class SnapshotService(
     }
   }
 
-  fun getHistory(): List<Map<String, Any>> = database.useStatement {
+  fun getHistory(): List<SnapshotContainer> = database.useStatement {
     executeQuery("select document, timestamp from history order by rowid")
       .let(::deserializeResultSet)
-      .map { it.content }
   }
 
   fun getLatest(): SnapshotContainer = database.useStatement {

@@ -11,7 +11,6 @@ import io.ktor.http.*
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import java.time.Instant
-import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 class LatestBTest : BFunSpec({ httpClient ->

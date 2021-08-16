@@ -13,7 +13,7 @@ fun Application.historyController(
   routing {
     get("/snapshots") {
       try {
-        call.respond(mapOf("history" to snapshotService.getHistory()))
+        call.respond(HistoryContainer(snapshotService.getHistory()))
       } catch (exception: Exception) {
         log.error("There was an error getting history", exception)
         call.respond(HttpStatusCode.InternalServerError)

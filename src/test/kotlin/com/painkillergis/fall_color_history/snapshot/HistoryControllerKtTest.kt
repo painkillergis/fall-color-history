@@ -24,7 +24,7 @@ class HistoryControllerKtTest : FunSpec({
 
   test("get history") {
     withTestController {
-      val history = emptyList<Map<String, Any>>()
+      val history = emptyList<SnapshotContainer>()
       every { snapshotService.getHistory() } returns history
       handleRequest(HttpMethod.Get, "/snapshots").apply {
         response.status() shouldBe HttpStatusCode.OK

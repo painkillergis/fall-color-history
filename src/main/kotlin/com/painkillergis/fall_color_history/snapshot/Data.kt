@@ -6,12 +6,12 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 
 @Serializable
+data class HistoryContainer(val history: List<SnapshotContainer>)
+
+@Serializable
 data class SnapshotContainer(
   val timestamp: String = "",
   val content: JsonObject = buildJsonObject { },
 ) {
-  constructor(timestamp: String, content: Map<String, Any>) : this(
-    timestamp,
-    content.toJsonObject(),
-  )
+  constructor(timestamp: String, content: Map<String, Any>) : this(timestamp, content.toJsonObject())
 }
