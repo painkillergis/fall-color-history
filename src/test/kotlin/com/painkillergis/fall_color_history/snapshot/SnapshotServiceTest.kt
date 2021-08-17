@@ -70,4 +70,22 @@ class SnapshotServiceTest : FunSpec({
       SnapshotContainer("third", mapOf("the" to "same update")),
     )
   }
+
+  test("photo field does not impact distinctness of a snapshot") {
+    snapshotService.replaceLatest(mapOf("the" to "same update", "photo" to "photo"))
+    snapshotService.replaceLatest(mapOf("the" to "same update"))
+
+    snapshotService.getHistory() shouldBe listOf(
+      SnapshotContainer("first", mapOf("the" to "same update", "photo" to "photo")),
+    )
+
+    snapshotService.clear()
+
+    snapshotService.replaceLatest(mapOf("the" to "same update"))
+    snapshotService.replaceLatest(mapOf("the" to "same update", "photo" to "photo"))
+
+    snapshotService.getHistory() shouldBe listOf(
+      SnapshotContainer("second", mapOf("the" to "same update")),
+    )
+  }
 })

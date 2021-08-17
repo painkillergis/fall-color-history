@@ -59,6 +59,22 @@ class HistoryBTest : BFunSpec({ httpClient ->
       SnapshotContainerMatcher(mapOf("the" to "same update")),
     )
   }
+
+  test("photo field does not impact distinctness of a snapshot")  {
+    httpClient.put<Unit>("/snapshots/latest") {
+      contentType(ContentType.Application.Json)
+      body = mapOf("the" to "same update", "photo" to "photo")
+    }
+
+    httpClient.put<Unit>("/snapshots/latest") {
+      contentType(ContentType.Application.Json)
+      body = mapOf("the" to "same update")
+    }
+
+    httpClient.get<HistoryContainer>("/snapshots").shouldBeHistory(
+      SnapshotContainerMatcher(mapOf("the" to "same update", "photo" to "photo")),
+    )
+  }
 })
 
 fun HistoryContainer.shouldBeHistory(vararg matcher: SnapshotContainerMatcher) {

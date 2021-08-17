@@ -2,6 +2,7 @@ package com.painkillergis.fall_color_history.snapshot
 
 import com.painkillergis.fall_color_history.Database
 import com.painkillergis.fall_color_history.util.toJsonElement
+import com.painkillergis.fall_color_history.util.toJsonObject
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -41,7 +42,9 @@ class SnapshotService(
     }
 
   fun replaceLatest(latest: Map<String, Any>) = database.useConnection {
-    if (getLatest().content != latest.toJsonElement()) {
+    val previousWithoutPhoto = getLatest().content.filterKeys { it != "photo" }
+    val nextWithoutPhoto = latest.toJsonObject().filterKeys { it != "photo" }
+    if (previousWithoutPhoto != nextWithoutPhoto) {
       prepareStatement("insert into history (document, timestamp) values (?, ?)").use {
         it.setString(1, Json.encodeToString(latest.toJsonElement()))
         it.setString(2, timestampService.getTimestamp())
