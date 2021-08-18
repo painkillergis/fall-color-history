@@ -14,7 +14,6 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
 import org.slf4j.Logger
 
 class LatestControllerKtTest : FunSpec({
@@ -29,8 +28,8 @@ class LatestControllerKtTest : FunSpec({
 
   test("get latest") {
     withTestController {
-      val latest = mapOf("the" to "late latest")
-      every { snapshotService.getLatest() } returns SnapshotContainer("timestamp", latest)
+      val latest = LocationsContainer(mapOf("the" to "late latest"))
+      every { snapshotService.getLatestSnapshot() } returns SnapshotContainer("timestamp", latest)
       handleRequest(HttpMethod.Get, "/snapshots/latest").apply {
         response.status() shouldBe HttpStatusCode.OK
         Json.decodeFromString<JsonObject>(response.content!!) shouldBe mapOf(
@@ -44,7 +43,7 @@ class LatestControllerKtTest : FunSpec({
   test("get latest has error") {
     withTestController {
       val exception = RuntimeException("the message")
-      every { snapshotService.getLatest() } throws exception
+      every { snapshotService.getLatestSnapshot() } throws exception
       handleRequest(HttpMethod.Get, "/snapshots/latest").apply {
         response.status() shouldBe HttpStatusCode.InternalServerError
       }
@@ -54,7 +53,7 @@ class LatestControllerKtTest : FunSpec({
 
   test("replace latest") {
     withTestController {
-      val latest = mapOf("the" to "late late latest")
+      val latest = LocationsContainer(mapOf("the" to "late late latest"))
 
       handleRequest(HttpMethod.Put, "/snapshots/latest") {
         addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
@@ -63,7 +62,7 @@ class LatestControllerKtTest : FunSpec({
         response.status() shouldBe HttpStatusCode.NoContent
       }
 
-      verify { snapshotService.replaceLatest(latest.toJsonElement() as JsonObject) }
+      verify { snapshotService.replaceLatest(latest) }
     }
   }
 

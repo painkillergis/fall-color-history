@@ -27,19 +27,19 @@ class HistoryBTest : BFunSpec({ httpClient ->
   test("history after updates") {
     httpClient.put<Unit>("/snapshots/latest") {
       contentType(ContentType.Application.Json)
-      body = mapOf("the" to "first update")
+      body = LocationsContainer(mapOf("the" to "first update"))
     }
 
     httpClient.put<Unit>("/snapshots/latest") {
       contentType(ContentType.Application.Json)
-      body = mapOf("the" to "second update")
+      body = LocationsContainer(mapOf("the" to "second update"))
     }
 
     httpClient.get<HttpResponse>("/snapshots").apply {
       status shouldBe HttpStatusCode.OK
       receive<HistoryContainer>().shouldBeHistory(
-        SnapshotContainerMatcher(mapOf("the" to "first update")),
-        SnapshotContainerMatcher(mapOf("the" to "second update")),
+        SnapshotContainerMatcher(LocationsContainer(mapOf("the" to "first update"))),
+        SnapshotContainerMatcher(LocationsContainer(mapOf("the" to "second update"))),
       )
     }
   }
@@ -47,32 +47,32 @@ class HistoryBTest : BFunSpec({ httpClient ->
   test("discard duplicate updates") {
     httpClient.put<Unit>("/snapshots/latest") {
       contentType(ContentType.Application.Json)
-      body = mapOf("the" to "same update")
+      body = LocationsContainer(mapOf("the" to "same update"))
     }
 
     httpClient.put<Unit>("/snapshots/latest") {
       contentType(ContentType.Application.Json)
-      body = mapOf("the" to "same update")
+      body = LocationsContainer(mapOf("the" to "same update"))
     }
 
     httpClient.get<HistoryContainer>("/snapshots").shouldBeHistory(
-      SnapshotContainerMatcher(mapOf("the" to "same update")),
+      SnapshotContainerMatcher(LocationsContainer(mapOf("the" to "same update"))),
     )
   }
 
-  test("photo field does not impact distinctness of a snapshot")  {
+  test("photo field does not impact distinctness of a snapshot") {
     httpClient.put<Unit>("/snapshots/latest") {
       contentType(ContentType.Application.Json)
-      body = mapOf("the" to "same update", "photo" to "photo")
+      body = LocationsContainer(mapOf("the" to "same update", "photo" to "photo"))
     }
 
     httpClient.put<Unit>("/snapshots/latest") {
       contentType(ContentType.Application.Json)
-      body = mapOf("the" to "same update")
+      body = LocationsContainer(mapOf("the" to "same update"))
     }
 
     httpClient.get<HistoryContainer>("/snapshots").shouldBeHistory(
-      SnapshotContainerMatcher(mapOf("the" to "same update", "photo" to "photo")),
+      SnapshotContainerMatcher(LocationsContainer(mapOf("the" to "same update", "photo" to "photo"))),
     )
   }
 })
@@ -81,7 +81,7 @@ fun HistoryContainer.shouldBeHistory(vararg matcher: SnapshotContainerMatcher) {
   history.size shouldBe matcher.size
   history.zip(matcher).forEachIndexed { index, (actual, matcher) ->
     try {
-      actual.content.toJsonObject() shouldBe matcher.content.toJsonObject()
+      actual.content shouldBe matcher.content
       Instant.from(DateTimeFormatter.ISO_OFFSET_DATE_TIME.parse(actual.timestamp))
         .shouldBeBetween(
           matcher.timestamp.minusMillis(matcher.timestampToleranceMs),
@@ -94,7 +94,7 @@ fun HistoryContainer.shouldBeHistory(vararg matcher: SnapshotContainerMatcher) {
 }
 
 data class SnapshotContainerMatcher(
-  val content: Map<String, Any>,
+  val content: LocationsContainer,
   val timestamp: Instant = Instant.now(),
   val timestampToleranceMs: Long = 1000,
 )

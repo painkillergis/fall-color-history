@@ -15,7 +15,7 @@ fun Application.latestController(
   routing {
     get("/snapshots/latest") {
       try {
-        call.respond(snapshotService.getLatest())
+        call.respond(snapshotService.getLatestSnapshot())
       } catch (exception: Exception) {
         log.error("There was an error getting the latest", exception)
         call.respond(HttpStatusCode.InternalServerError)
@@ -23,7 +23,7 @@ fun Application.latestController(
     }
     put("/snapshots/latest") {
       try {
-        snapshotService.replaceLatest(call.receive<JsonObject>())
+        snapshotService.replaceLatest(call.receive())
         call.respond(HttpStatusCode.NoContent)
       } catch (exception: Exception) {
         log.error("There was an error setting the latest", exception)

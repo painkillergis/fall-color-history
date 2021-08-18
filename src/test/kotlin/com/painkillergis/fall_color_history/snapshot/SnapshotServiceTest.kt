@@ -18,24 +18,24 @@ class SnapshotServiceTest : FunSpec({
   }
 
   test("default latest") {
-    snapshotService.getLatest() shouldBe SnapshotContainer()
+    snapshotService.getLatestSnapshot() shouldBe SnapshotContainer()
   }
 
   test("replace default latest") {
-    val latest = mapOf("the" to "late latest")
+    val latest = LocationsContainer(mapOf("the" to "late latest"))
     snapshotService.replaceLatest(latest)
 
-    snapshotService.getLatest() shouldBe SnapshotContainer("first", latest)
+    snapshotService.getLatestSnapshot() shouldBe SnapshotContainer("first", latest)
     snapshotService.getHistory() shouldBe listOf(SnapshotContainer("first", latest))
   }
 
   test("replace latest") {
-    val oldest = mapOf("the" to "old oldest")
-    val latest = mapOf("the" to "late latest")
+    val oldest = LocationsContainer(mapOf("the" to "old oldest"))
+    val latest = LocationsContainer(mapOf("the" to "late latest"))
     snapshotService.replaceLatest(oldest)
     snapshotService.replaceLatest(latest)
 
-    snapshotService.getLatest() shouldBe SnapshotContainer("second", latest)
+    snapshotService.getLatestSnapshot() shouldBe SnapshotContainer("second", latest)
     snapshotService.getHistory() shouldBe listOf(
       SnapshotContainer("first", oldest),
       SnapshotContainer("second", latest),
@@ -43,49 +43,54 @@ class SnapshotServiceTest : FunSpec({
   }
 
   test("clear") {
-    snapshotService.replaceLatest(mapOf("the" to "update to clear"))
+    snapshotService.replaceLatest(LocationsContainer(mapOf("the" to "update to clear")))
     snapshotService.clear()
 
-    snapshotService.getLatest() shouldBe SnapshotContainer()
+    snapshotService.getLatestSnapshot() shouldBe SnapshotContainer()
     snapshotService.getHistory() shouldBe emptyList<Unit>()
   }
 
   test("discard duplicate updates") {
-    snapshotService.replaceLatest(mapOf("the" to "same update"))
-    snapshotService.replaceLatest(mapOf("the" to "same update"))
+    val update = LocationsContainer(mapOf("the" to "same update"))
+    snapshotService.replaceLatest(update)
+    snapshotService.replaceLatest(update)
 
     snapshotService.getHistory() shouldBe listOf(
-      SnapshotContainer("first", mapOf("the" to "same update")),
+      SnapshotContainer("first", update),
     )
   }
 
   test("preserve non-sequential duplicate updates") {
-    snapshotService.replaceLatest(mapOf("the" to "same update"))
-    snapshotService.replaceLatest(mapOf("the" to "different update"))
-    snapshotService.replaceLatest(mapOf("the" to "same update"))
+    val same = LocationsContainer(mapOf("the" to "same update"))
+    val different = LocationsContainer(mapOf("the" to "different update"))
+    snapshotService.replaceLatest(same)
+    snapshotService.replaceLatest(different)
+    snapshotService.replaceLatest(same)
 
     snapshotService.getHistory() shouldBe listOf(
-      SnapshotContainer("first", mapOf("the" to "same update")),
-      SnapshotContainer("second", mapOf("the" to "different update")),
-      SnapshotContainer("third", mapOf("the" to "same update")),
+      SnapshotContainer("first", same),
+      SnapshotContainer("second", different),
+      SnapshotContainer("third", same),
     )
   }
 
   test("photo field does not impact distinctness of a snapshot") {
-    snapshotService.replaceLatest(mapOf("the" to "same update", "photo" to "photo"))
-    snapshotService.replaceLatest(mapOf("the" to "same update"))
+    val withPhoto = LocationsContainer(mapOf("the" to "same update", "photo" to "photo"))
+    val withoutPhoto = LocationsContainer(mapOf("the" to "same update"))
+    snapshotService.replaceLatest(withPhoto)
+    snapshotService.replaceLatest(withoutPhoto)
 
     snapshotService.getHistory() shouldBe listOf(
-      SnapshotContainer("first", mapOf("the" to "same update", "photo" to "photo")),
+      SnapshotContainer("first", withPhoto),
     )
 
     snapshotService.clear()
 
-    snapshotService.replaceLatest(mapOf("the" to "same update"))
-    snapshotService.replaceLatest(mapOf("the" to "same update", "photo" to "photo"))
+    snapshotService.replaceLatest(withoutPhoto)
+    snapshotService.replaceLatest(withPhoto)
 
     snapshotService.getHistory() shouldBe listOf(
-      SnapshotContainer("second", mapOf("the" to "same update")),
+      SnapshotContainer("second", withoutPhoto),
     )
   }
 })
