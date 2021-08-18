@@ -1,6 +1,6 @@
-cat <<EOF | ssh yagni
+cat <<EOF | ssh yagni -T
   cd /home/arctair/fall-color-history
   git pull
-  ./gradlew shadowJar
+  ./gradlew clean shadowJar
   systemctl restart fall-color-history --user
 EOF
