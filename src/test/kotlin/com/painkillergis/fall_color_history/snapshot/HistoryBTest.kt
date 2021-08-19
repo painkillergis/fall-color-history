@@ -61,18 +61,37 @@ class HistoryBTest : BFunSpec({ httpClient ->
   }
 
   test("photo field does not impact distinctness of a snapshot") {
+    val withPhoto = LocationsContainer(mapOf("the" to "same update", "photo" to "123456"))
+    val withoutPhoto = LocationsContainer(mapOf("the" to "same update"))
+
     httpClient.put<Unit>("/snapshots/latest") {
       contentType(ContentType.Application.Json)
-      body = LocationsContainer(mapOf("the" to "same update", "photo" to "photo"))
+      body = withPhoto
     }
 
     httpClient.put<Unit>("/snapshots/latest") {
       contentType(ContentType.Application.Json)
-      body = LocationsContainer(mapOf("the" to "same update"))
+      body = withoutPhoto
     }
 
     httpClient.get<HistoryContainer>("/snapshots").shouldBeHistory(
-      SnapshotContainerMatcher(LocationsContainer(mapOf("the" to "same update", "photo" to "photo"))),
+      SnapshotContainerMatcher(withPhoto),
+    )
+
+    httpClient.delete<Unit>("/snapshots")
+
+    httpClient.put<Unit>("/snapshots/latest") {
+      contentType(ContentType.Application.Json)
+      body = withoutPhoto
+    }
+
+    httpClient.put<Unit>("/snapshots/latest") {
+      contentType(ContentType.Application.Json)
+      body = withPhoto
+    }
+
+    httpClient.get<HistoryContainer>("/snapshots").shouldBeHistory(
+      SnapshotContainerMatcher(withoutPhoto),
     )
   }
 })
